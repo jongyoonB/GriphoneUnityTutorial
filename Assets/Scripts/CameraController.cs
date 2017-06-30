@@ -1,21 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
-public class CameraController : MonoBehaviour {
+public class CameraController : MonoBehaviour
+{
 
-    public GameObject Player;
+    public GameObject player;
 
     private Vector3 offset;
-	// Use this for initialization
-	void Start () {
-        offset = transform.position - Player.transform.position;
-	}
+
+    void Start()
+    {
+        offset = transform.position - player.transform.position;
+    }
 
     void LateUpdate()
     {
-        transform.position = Player.transform.position + offset;
+        transform.position = player.transform.position + offset;
     }
-
-
 }
