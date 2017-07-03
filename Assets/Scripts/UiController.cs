@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,41 +58,48 @@ public class UiController : MonoBehaviour {
     }
     
     //Playerprefsからランキングを読みだす
-    private void LoadLeaderBoard()
+    public void LoadLeaderBoard()
     {
         List<string[]> rank = new List<string[]>();
-
+        isEnterPressed = false;
         try
         {
             rank = rankingController.GetRanking(nameField.GetComponent<InputField>().text, gameManager.timeLap);
             for (int i = 0; i < (rank.Count > 3 ? 3 : rank.Count); i++)
             {
                 rankText[i].SetActive(true);
-                rankText[i].GetComponent<Text>().text = rank[i][0] + " : " + rank[i][1];
+                rankText[i].GetComponent<Text>().text = "No." + (i + 1).ToString() + " : " + rank[i][0] + " : " + rank[i][1];
             }
 
-            if (rank.Count > 3 && gameManager.timeLap > float.Parse(rank[2][1]))
+            if (!nameField.GetComponent<InputField>().text.Equals(""))
             {
-                current.SetActive(true);
-                current.GetComponent<Text>().text = "You" + " : " + gameManager.timeLap.ToString("N2");
+                if (rank.Count > 3 && gameManager.timeLap > float.Parse(rank[2][1]))
+                {
+                    current.SetActive(true);
+                    current.GetComponent<Text>().text = "You" + " : " + gameManager.timeLap.ToString("N2");
+                }
+                nameField.GetComponent<InputField>().text = "";
+                nameField.SetActive(false);
+                SetInstructionText("Press 'R' to Restart Game");
             }
-            nameField.GetComponent<InputField>().text = "";
-            nameField.SetActive(false);
-
-            SetInstructionText("Press 'R' to Restart Game");
+            
         }
         catch (Exception ex)
         {
-            isEnterPressed = false;
             nameField.GetComponent<InputField>().text = "";
-            SetInstructionText("That name already registered");
+            SetInstructionText(ex.Message);
             throw ex; 
         }
+        
     }
 
     void OnGUI()
     {
-        if (!isEnterPressed && nameField.GetComponent<InputField>().isFocused && nameField.GetComponent<InputField>().text != "" && (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)))
+        if (nameField.GetComponent<InputField>().isFocused && nameField.GetComponent<InputField>().text != "" && (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)))
+        {
+            Debug.Log(isEnterPressed);
+        }
+            if (!isEnterPressed && nameField.GetComponent<InputField>().isFocused && nameField.GetComponent<InputField>().text != "" && (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)))
         {
             isEnterPressed = true;
             LoadLeaderBoard();

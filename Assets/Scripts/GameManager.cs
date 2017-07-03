@@ -41,9 +41,10 @@ public class GameManager : MonoBehaviour {
                 {
                     isGameOver = true;
                     uiController.SetNameField();
+                    uiController.LoadLeaderBoard();
                 }
             }
-            //if isGameover = false &&'R' pressed -> call restart method
+            //isGameover = false &&'R' pressed -> call restart method
             if (Input.GetKeyUp(KeyCode.R) && !uiController.nameField.activeInHierarchy)
             {
                 Debug.Log("Restart Game");
@@ -59,7 +60,8 @@ public class GameManager : MonoBehaviour {
                 PlayerPrefs.DeleteAll();
             }
             //Start Game
-            if (Input.GetKeyUp(KeyCode.Space)){
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
                 CreateCube();
                 isGameStart = true;
                 Debug.Log("Game Start");

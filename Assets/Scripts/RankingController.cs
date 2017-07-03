@@ -34,37 +34,37 @@ public class RankingController : MonoBehaviour {
         string savedRanking;
         List<string[]> rankList = new List<string[]>();
         string[] substr;
-
         if (userCount > 1)
         {
             for (int i = 0; i < userCount-1; i++)
             {
                 //check ranking data exist
-                if (PlayerPrefs.HasKey("score" + i.ToString())) {
+                if (PlayerPrefs.HasKey("score" + i.ToString()))
+                {
                     savedRanking = PlayerPrefs.GetString("score" + i.ToString());
                     substr = savedRanking.ToString().Split(':');
 
-                    //check name is duplicated
+                    // if name exist &&check name is duplicated
                     if (substr[0].Equals(name))
                     {
-                        throw new System.Exception("name is duplicated");
+                        throw new System.Exception("That name already registered");
                     }
 
                     rankList.Add(new string[] { substr[0], substr[1] });
                 }
-                //throw error
                 else
                 {
                     throw new System.Exception("Failed to Load Ranking");
                 }
+                
             }
         }
-        //add current timeLap to rankList
-        rankList.Add(new string[] { name, timeLap.ToString("N2") });
-
-        //sort ranking
-        rankList.Sort((sa1, sa2) => sa1[1].CompareTo(sa2[1]));
-
+        if (!name.Equals(""))
+        {
+            //add current timeLap to rankList
+            rankList.Add(new string[] { name, timeLap.ToString("N2") });
+        }
+        rankList.Sort((sa1, sa2) => float.Parse(sa1[1]).CompareTo(float.Parse(sa2[1])));
         //update ranking to playerprefs
         UpdateRanking(rankList);
 
@@ -77,6 +77,7 @@ public class RankingController : MonoBehaviour {
         //update ranking
         for(int i = 0; i < rankList.Count; i++)
         {
+            Debug.Log(rankList[i][0] + " : " + rankList[i][1]);
             PlayerPrefs.SetString("score" + i.ToString(), rankList[i][0] + ":" + rankList[i][1]);
         }
 
