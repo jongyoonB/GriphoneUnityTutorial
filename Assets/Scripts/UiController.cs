@@ -1,17 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UiController : MonoBehaviour {
+    /*
+     * timerText : 画面上のタイムラップ
+     * countText : 画面上のカウンター
+     * instruction : 画面上の指示門
+     * isEnterPressed : エンターキーのpressを判別
+     */
     public Text timerText;
     public Text countText;
     public Text instruction;
     public GameObject nameField;
-    public Text[] rankText;
-
+    public GameObject[] rankText;
+    public GameObject current;
     private GameManager gameManager;
     private RankingController rankingController;
+    private bool isEnterPressed;
 
     void Start()
     {
@@ -21,6 +29,7 @@ public class UiController : MonoBehaviour {
         SetInstructionText("Press 'Space' to Start");
     }
 
+    //画面上のタイマーのテキストを設定
     public float SetTimerText(float timeLap)
     {
         timeLap += Time.deltaTime;
@@ -28,16 +37,19 @@ public class UiController : MonoBehaviour {
         return timeLap;
     }
 
+    //画面上のカウンターのテキストを設定
     public void SetCountText(int count)
     {
         countText.text = "Remain : " + count.ToString();
     }
 
+    //画面上の指示門のテキストを設定
     public void SetInstructionText(string text)
     {
         instruction.text = text;
     }
 
+    //名前入力のフィールドのテキストを設定
     public void SetNameField()
     {
         SetInstructionText("");
@@ -46,45 +58,44 @@ public class UiController : MonoBehaviour {
         nameField.GetComponent<InputField>().lineType = InputField.LineType.SingleLine;
     }
     
+    //Playerprefsからランキングを読みだす
     private void LoadLeaderBoard()
     {
-        bool success = false;
         List<string[]> rank = new List<string[]>();
-        do
+
+        try
         {
-            //try
+            rank = rankingController.GetRanking(nameField.GetComponent<InputField>().text, gameManager.timeLap);
+            for (int i = 0; i < (rank.Count > 3 ? 3 : rank.Count); i++)
             {
-                rank = rankingController.GetRanking(nameField.GetComponent<InputField>().text, gameManager.timeLap);
-                nameField.GetComponent<InputField>().text = "";
-                SetInstructionText("Press 'R' to Restart Game");
-                nameField.SetActive(false);
-
-                for (int i = 0; i < rank.Count - 1; i++)
-                {
-                    //rankText[i].text = rank[i][0] + " : " + rank[i][1];
-                }
-
-                foreach (string[] record in rank)
-                {
-                    Debug.Log("Entire Ranking");
-                    Debug.Log(record[0] + " : " + record[1]);
-                }
-                success = true;
+                rankText[i].SetActive(true);
+                rankText[i].GetComponent<Text>().text = rank[i][0] + " : " + rank[i][1];
             }
-            //catch
+
+            if (rank.Count > 3 && gameManager.timeLap > float.Parse(rank[2][1]))
             {
-                nameField.GetComponent<InputField>().text = "";
-                SetInstructionText("That name already registered");
+                current.SetActive(true);
+                current.GetComponent<Text>().text = "You" + " : " + gameManager.timeLap.ToString("N2");
             }
-        } while (success);
-        
-        
+            nameField.GetComponent<InputField>().text = "";
+            nameField.SetActive(false);
+
+            SetInstructionText("Press 'R' to Restart Game");
+        }
+        catch (Exception ex)
+        {
+            isEnterPressed = false;
+            nameField.GetComponent<InputField>().text = "";
+            SetInstructionText("That name already registered");
+            throw ex; 
+        }
     }
-    
+
     void OnGUI()
     {
-        if (nameField.GetComponent<InputField>().isFocused && nameField.GetComponent<InputField>().text != "" && Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))
+        if (!isEnterPressed && nameField.GetComponent<InputField>().isFocused && nameField.GetComponent<InputField>().text != "" && (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)))
         {
+            isEnterPressed = true;
             LoadLeaderBoard();
         }
     }

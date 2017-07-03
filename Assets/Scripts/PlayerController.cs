@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
-{
-    public float speed;
-    public Material pickUpYellow;
-    public Material pickUpPurple;
+public class PlayerController : MonoBehaviour {
 
+    /*
+    *  speed : 卵の速度
+    *  cubeMaterialYellow : cubeのmaterial
+    *  cubeMaterialPurple : cubeのmaterial
+    */
+    public float speed;
+    public Material cubeMaterialYellow;
+    public Material cubeMaterialPurple;
     private GameManager gameManager;
     private UiController uiController;
     private Rigidbody rb;
     private Renderer rend;
 
-    // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -39,11 +42,11 @@ public class PlayerController : MonoBehaviour
             gameManager.count -= 1;
             if (gameManager.count % 2 == 0)
             {
-                rend.material = pickUpPurple;
+                rend.material = cubeMaterialPurple;
             }
             else
             {
-                rend.material = pickUpYellow;
+                rend.material = cubeMaterialYellow;
             }
         }
         uiController.SetCountText(gameManager.count);
